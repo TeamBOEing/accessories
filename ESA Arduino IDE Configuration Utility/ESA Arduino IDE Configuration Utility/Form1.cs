@@ -15,35 +15,37 @@ namespace ESA_Arduino_IDE_Configuration_Utility
 {
     public partial class ConfigUtilityForm : Form
     {
+        delegate void VoidDelegate();
+
         public ConfigUtilityForm()
         {
             InitializeComponent();
-            Operate();
         }
 
-        private void Operate()
+        public void Operate()
         {
             string appdataRoaming = System.Environment.GetFolderPath(System.Environment.SpecialFolder.ApplicationData);
-            string documents = System.Environment.GetFolderPath(System.Environment.SpecialFolder.MyDocuments);
             string downloads = System.Environment.GetFolderPath(System.Environment.SpecialFolder.UserProfile) + @"\Downloads";
             string workingDir = Directory.GetCurrentDirectory();
             string programConfig = Path.Combine(workingDir, "config.txt");
             string ideConfigFolder = "";
-            string sketchbookFolder = "";
             string ideConfigLocationOverride = "";
             string sketchbookLocationOverride = "";
+            string sketchbookPath = "";
             bool ideConfigOverride = false;
             bool sketchbookOverride = false;
+            Uri libraryLocationOnline = null;
+            Uri codeAndTestLocationOnline = null;
 
             using (StreamReader sr = File.OpenText(programConfig))
             {
                 string s = "";
-                while ((s = sr.ReadLine()) != null && !(ideConfigOverride && sketchbookOverride))
+                while ((s = sr.ReadLine()) != null)
                 {
                     if (s[0] != '#')
                     {
                         string[] options = s.Split(':');
-                        switch(options[0])
+                        switch (options[0])
                         {
                             case "IDEConfigLocationOverride":
                                 ideConfigOverride = true;
@@ -56,8 +58,11 @@ namespace ESA_Arduino_IDE_Configuration_Utility
                             case "IDEConfigPath":
                                 ideConfigFolder = options[1].Trim();
                                 break;
-                            case "SketchbookFolder":
-                                sketchbookFolder = options[1].Trim();
+                            case "OnlineLibraryLocation":
+                                libraryLocationOnline = new Uri(@String.Concat(options[1].Trim(), ":", options[2]));
+                                break;
+                            case "OnlineProjectLocations":
+                                codeAndTestLocationOnline = new Uri(@String.Concat(options[1].Trim(), ":", options[2]));
                                 break;
                         }
                     }
@@ -65,64 +70,182 @@ namespace ESA_Arduino_IDE_Configuration_Utility
             }
 
             WebClient client = new WebClient();
-            Uri libraryLocationOnline = new Uri(@"https://github.com/TeamBOEing/user_functions/archive/master.zip");
-            Uri codeAndTestLocationOnline = new Uri(@"https://github.com/TeamBOEing/accessories/archive/master.zip");
+            
+            try
+            {
+                client.DownloadFile(libraryLocationOnline, Path.Combine(downloads, "BOEbot_library.zip"));
+                this.Invoke(new VoidDelegate(Download1Finished));
+            }
+            catch (Exception e)
+            {
+                this.Invoke(new VoidDelegate(Download1Error));
+            }
 
-            client.DownloadFile(libraryLocationOnline, Path.Combine (downloads, "BOEbot_library.zip"));
-            client.DownloadFile(codeAndTestLocationOnline, Path.Combine(downloads, "BOEbot_code.zip"));
+            try
+            {
+                client.DownloadFile(codeAndTestLocationOnline, Path.Combine(downloads, "BOEbot_code.zip"));
+                this.Invoke(new VoidDelegate(Download2Finished));
+            }
+            catch (Exception e)
+            {
+                this.Invoke(new VoidDelegate(Download2Error));
+            }
 
-            Directory.Delete(Path.Combine(downloads, "user_functions-master"), true);
-            Directory.Delete(Path.Combine(downloads, "accessories-master"), true);
-            ZipFile.ExtractToDirectory(Path.Combine(downloads, "BOEbot_library.zip"), downloads);
-            ZipFile.ExtractToDirectory(Path.Combine(downloads, "BOEbot_code.zip"), downloads);
+            try
+            {
+                Directory.Delete(Path.Combine(downloads, "user_functions-master"), true);
+                Directory.Delete(Path.Combine(downloads, "accessories-master"), true);
+            }
+            catch (Exception e) { /* will error if no such directory exists */ }
+
+            try
+            {
+                ZipFile.ExtractToDirectory(Path.Combine(downloads, "BOEbot_library.zip"), downloads);
+                ZipFile.ExtractToDirectory(Path.Combine(downloads, "BOEbot_code.zip"), downloads);
+            }
+            catch (Exception e) {  /* */ }
 
             string ideConfigPath = ideConfigOverride ? ideConfigLocationOverride : Path.Combine(appdataRoaming, ideConfigFolder);
-            string sketchbookPath = sketchbookOverride ? sketchbookLocationOverride : Path.Combine(documents, sketchbookFolder);
             string librariesDirectory = Path.Combine(sketchbookPath, @"libraries\BOEbot");
             string accessoriesSrc = Path.Combine(downloads, "accessories-master");
             string librariesSrc = Path.Combine(downloads, "user_functions-master");
             string boeBotProjectDst = Path.Combine(sketchbookPath, @"ESA_Robot_Project\ESA_Robot_Project.ino");
             string boeBotTestDst = Path.Combine(sketchbookPath, @"ESA_Robot_Test\ESA_Robot_Test.ino");
 
-            lblStatus.Text = "Configuring Arduino IDE...";
-
             List<String> configData = new List<String>();
 
-            using (StreamReader sr = new StreamReader(ideConfigPath))
+            try
             {
-                string s = "";
-                while ((s = sr.ReadLine()) != null)
+                using (StreamReader sr = new StreamReader(ideConfigPath))
                 {
-                    string[] options = s.Split('=');
-                    switch(options[0])
+                    string s = "";
+                    while ((s = sr.ReadLine()) != null)
                     {
-                        case "board": configData.Add("board=lilypad"); break;
-                        case "custom_cpu": configData.Add("custom_cpu=lilypad_atmega328"); break;
-                        case "editor.linenumbers": configData.Add("editor.linenumbers=true"); break;
-                        case "recent.sketches": configData.Add("recent.sketches=" + boeBotProjectDst + "," + boeBotTestDst);  break;
-                        case "serial.debug_rate": configData.Add("serial.debug_rate=115200"); break;
-                        case "sketchbook.path": configData.Add("sketchbook.path=" + sketchbookPath); break;
-                        default: configData.Add(s); break;
+                        string[] options = s.Split('=');
+                        switch (options[0])
+                        {
+                            case "board": configData.Add("board=lilypad"); break;
+                            case "custom_cpu": configData.Add("custom_cpu=lilypad_atmega328"); break;
+                            case "editor.linenumbers": configData.Add("editor.linenumbers=true"); break;
+                            case "recent.sketches": configData.Add("recent.sketches=" + boeBotProjectDst + "," + boeBotTestDst); break;
+                            case "serial.debug_rate": configData.Add("serial.debug_rate=115200"); break;
+                            case "sketchbook.path": sketchbookPath = options[1]; configData.Add(s); break;
+                            default: configData.Add(s); break;
+                        }
                     }
                 }
+
+                using (StreamWriter sw = new StreamWriter(ideConfigPath, false))
+                {
+                    foreach (string s in configData)
+                    {
+                        sw.WriteLine(s);
+                    }
+                }
+
+                this.Invoke(new VoidDelegate(IDEConfigFinished));
+            }
+            catch (Exception e)
+            {
+                this.Invoke(new VoidDelegate(IDEConfigError));
             }
 
-            using (StreamWriter sw = new StreamWriter(ideConfigPath, false))
-            {
-                foreach (string s in configData)
-                {
-                    sw.WriteLine(s);
-                }
-            }
+            sketchbookPath = sketchbookOverride ? sketchbookLocationOverride : sketchbookPath;
+
 
             Microsoft.VisualBasic.Devices.Computer pc = new Microsoft.VisualBasic.Devices.Computer();
 
-            lblStatus.Text = "Installing BOEbot libraries...";
-            pc.FileSystem.CopyDirectory(Path.Combine(librariesSrc, "v1", "BOEbot"), librariesDirectory, true);
+            try
+            {
+                pc.FileSystem.CopyDirectory(Path.Combine(librariesSrc, "v1", "BOEbot"), librariesDirectory, true);
+                this.Invoke(new VoidDelegate(Install1Finished));
+            }
+            catch (Exception e)
+            {
+                this.Invoke(new VoidDelegate(Install1Error));
+            }
+            
+            try
+            {
+                pc.FileSystem.CopyDirectory(Path.Combine(accessoriesSrc, "ESA_Robot_Project"), Path.Combine(sketchbookPath, "ESA_Robot_Project"), true);
+                pc.FileSystem.CopyDirectory(Path.Combine(accessoriesSrc, "ESA_Robot_Test"), Path.Combine(sketchbookPath, "ESA_Robot_Test"), true);
 
-            lblStatus.Text = "Installing Robot Project template...";
-            pc.FileSystem.CopyDirectory(Path.Combine(accessoriesSrc, "ESA_Robot_Project"), Path.Combine(sketchbookPath, "ESA_Robot_Project"), true);
-            pc.FileSystem.CopyDirectory(Path.Combine(accessoriesSrc, "ESA_Robot_Test"), Path.Combine(sketchbookPath, "ESA_Robot_Test"), true);
+                this.Invoke(new VoidDelegate(Install2Finished));
+            }
+            catch (Exception e)
+            {
+                this.Invoke(new VoidDelegate(Install2Error));
+            }
+        }
+
+        void Download1Finished()
+        {
+            lblDownload1.Text = lblDownload1.Text + " Completed.";
+            lblDownload1.ForeColor = Color.Green;
+            pgbStatus.PerformStep();
+        }
+
+        void Download1Error()
+        {
+            lblDownload1.Text = lblDownload1.Text + " Error.";
+            lblDownload1.ForeColor = Color.Red;
+            pgbStatus.PerformStep();
+        }
+
+        void Download2Finished()
+        {
+            lblDownload2.Text = lblDownload2.Text + " Completed.";
+            lblDownload2.ForeColor = Color.Green;
+            pgbStatus.PerformStep();
+        }
+
+        void Download2Error()
+        {
+            lblDownload2.Text = lblDownload2.Text + " Error.";
+            lblDownload2.ForeColor = Color.Red;
+            pgbStatus.PerformStep();
+        }
+
+        void IDEConfigFinished()
+        {
+            lblUpdateIDE.Text = lblUpdateIDE.Text + " Completed.";
+            lblUpdateIDE.ForeColor = Color.Green;
+            pgbStatus.PerformStep();
+        }
+
+        void IDEConfigError()
+        {
+            lblUpdateIDE.Text = lblUpdateIDE.Text + " Error.";
+            lblUpdateIDE.ForeColor = Color.Red;
+            pgbStatus.PerformStep();
+        }
+
+        void Install1Finished()
+        {
+            lblInstall1.Text = lblInstall1.Text + " Completed.";
+            lblInstall1.ForeColor = Color.Green;
+            pgbStatus.PerformStep();
+        }
+
+        void Install1Error()
+        {
+            lblInstall1.Text = lblInstall1.Text + " Error.";
+            lblInstall1.ForeColor = Color.Red;
+            pgbStatus.PerformStep();
+        }
+
+        void Install2Finished()
+        {
+            lblInstall2.Text = lblInstall2.Text + " Completed.";
+            lblInstall2.ForeColor = Color.Green;
+            pgbStatus.PerformStep();
+        }
+
+        void Install2Error()
+        {
+            lblInstall2.Text = lblInstall2.Text + " Error.";
+            lblInstall2.ForeColor = Color.Red;
+            pgbStatus.PerformStep();
         }
     }
 }

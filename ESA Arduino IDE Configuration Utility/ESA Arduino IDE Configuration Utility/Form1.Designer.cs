@@ -30,7 +30,11 @@
         {
             this.lblDescription = new System.Windows.Forms.Label();
             this.pgbStatus = new System.Windows.Forms.ProgressBar();
-            this.lblStatus = new System.Windows.Forms.Label();
+            this.lblDownload1 = new System.Windows.Forms.Label();
+            this.lblDownload2 = new System.Windows.Forms.Label();
+            this.lblInstall1 = new System.Windows.Forms.Label();
+            this.lblUpdateIDE = new System.Windows.Forms.Label();
+            this.lblInstall2 = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // lblDescription
@@ -51,23 +55,70 @@
             this.pgbStatus.Location = new System.Drawing.Point(15, 63);
             this.pgbStatus.Name = "pgbStatus";
             this.pgbStatus.Size = new System.Drawing.Size(361, 23);
+            this.pgbStatus.Step = 20;
             this.pgbStatus.Style = System.Windows.Forms.ProgressBarStyle.Continuous;
             this.pgbStatus.TabIndex = 1;
             // 
-            // lblStatus
+            // lblDownload1
             // 
-            this.lblStatus.AutoSize = true;
-            this.lblStatus.Location = new System.Drawing.Point(12, 96);
-            this.lblStatus.Name = "lblStatus";
-            this.lblStatus.Size = new System.Drawing.Size(0, 13);
-            this.lblStatus.TabIndex = 3;
+            this.lblDownload1.AutoSize = true;
+            this.lblDownload1.ForeColor = System.Drawing.SystemColors.ControlDarkDark;
+            this.lblDownload1.Location = new System.Drawing.Point(12, 100);
+            this.lblDownload1.Name = "lblDownload1";
+            this.lblDownload1.Size = new System.Drawing.Size(156, 13);
+            this.lblDownload1.TabIndex = 2;
+            this.lblDownload1.Text = "Downloading BOEbot libraries...";
+            // 
+            // lblDownload2
+            // 
+            this.lblDownload2.AutoSize = true;
+            this.lblDownload2.ForeColor = System.Drawing.SystemColors.ControlDarkDark;
+            this.lblDownload2.Location = new System.Drawing.Point(12, 120);
+            this.lblDownload2.Name = "lblDownload2";
+            this.lblDownload2.Size = new System.Drawing.Size(274, 13);
+            this.lblDownload2.TabIndex = 3;
+            this.lblDownload2.Text = "Downloading BOEbot Project Template and Test Code...";
+            // 
+            // lblInstall1
+            // 
+            this.lblInstall1.AutoSize = true;
+            this.lblInstall1.ForeColor = System.Drawing.SystemColors.ControlDarkDark;
+            this.lblInstall1.Location = new System.Drawing.Point(12, 160);
+            this.lblInstall1.Name = "lblInstall1";
+            this.lblInstall1.Size = new System.Drawing.Size(135, 13);
+            this.lblInstall1.TabIndex = 5;
+            this.lblInstall1.Text = "Installing BOEbot libraries...";
+            // 
+            // lblUpdateIDE
+            // 
+            this.lblUpdateIDE.AutoSize = true;
+            this.lblUpdateIDE.ForeColor = System.Drawing.SystemColors.ControlDarkDark;
+            this.lblUpdateIDE.Location = new System.Drawing.Point(12, 140);
+            this.lblUpdateIDE.Name = "lblUpdateIDE";
+            this.lblUpdateIDE.Size = new System.Drawing.Size(184, 13);
+            this.lblUpdateIDE.TabIndex = 4;
+            this.lblUpdateIDE.Text = "Updating Arduino IDE Configuration...";
+            // 
+            // lblInstall2
+            // 
+            this.lblInstall2.AutoSize = true;
+            this.lblInstall2.ForeColor = System.Drawing.SystemColors.ControlDarkDark;
+            this.lblInstall2.Location = new System.Drawing.Point(12, 180);
+            this.lblInstall2.Name = "lblInstall2";
+            this.lblInstall2.Size = new System.Drawing.Size(253, 13);
+            this.lblInstall2.TabIndex = 6;
+            this.lblInstall2.Text = "Installing BOEbot Project Template and Test Code...";
             // 
             // ConfigUtilityForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(388, 120);
-            this.Controls.Add(this.lblStatus);
+            this.ClientSize = new System.Drawing.Size(388, 207);
+            this.Controls.Add(this.lblInstall2);
+            this.Controls.Add(this.lblInstall1);
+            this.Controls.Add(this.lblUpdateIDE);
+            this.Controls.Add(this.lblDownload2);
+            this.Controls.Add(this.lblDownload1);
             this.Controls.Add(this.pgbStatus);
             this.Controls.Add(this.lblDescription);
             this.Name = "ConfigUtilityForm";
@@ -81,7 +132,11 @@
 
         private System.Windows.Forms.Label lblDescription;
         private System.Windows.Forms.ProgressBar pgbStatus;
-        private System.Windows.Forms.Label lblStatus;
+        private System.Windows.Forms.Label lblDownload1;
+        private System.Windows.Forms.Label lblDownload2;
+        private System.Windows.Forms.Label lblInstall1;
+        private System.Windows.Forms.Label lblUpdateIDE;
+        private System.Windows.Forms.Label lblInstall2;
     }
 }
 

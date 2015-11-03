@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
+using System.Threading;
 using System.Windows.Forms;
 
 namespace ESA_Arduino_IDE_Configuration_Utility
@@ -16,7 +16,14 @@ namespace ESA_Arduino_IDE_Configuration_Utility
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new ConfigUtilityForm());
+
+            ConfigUtilityForm cfg = new ConfigUtilityForm();
+
+            Thread t = new Thread(cfg.Operate);
+            t.Start();
+
+            Application.Run(cfg);
+
         }
     }
 }

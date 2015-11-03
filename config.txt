@@ -1,5 +1,7 @@
 ﻿# Octothorpe is a comment and will be ignored.
 # IDEConfigLocationOverride: <enter path>
 # SketchbookLocationOverride: <enter path>
-IDEConfigFolder: Arduino15\preferences.txt
+IDEConfigPath: Arduino15\preferences.txt
 SketchbookFolder: Arduino
+OnlineLibraryLocation: https://github.com/TeamBOEing/user_functions/archive/master.zip
+OnlineProjectLocations: https://github.com/TeamBOEing/accessories/archive/master.zip
