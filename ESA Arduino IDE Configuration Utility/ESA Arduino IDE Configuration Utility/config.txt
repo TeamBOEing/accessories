@@ -1,5 +1,0 @@
-﻿# Octothorpe is a comment and will be ignored.
-# IDEConfigLocationOverride: <enter path>
-# SketchbookLocationOverride: <enter path>
-IDEConfigFolder: Arduino15\preferences.txt
-SketchbookFolder: Arduino
