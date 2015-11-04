@@ -131,7 +131,6 @@ namespace ESA_Arduino_IDE_Configuration_Utility
                             case "board": configData.Add("board=lilypad"); break;
                             case "custom_cpu": configData.Add("custom_cpu=lilypad_atmega328"); break;
                             case "editor.linenumbers": configData.Add("editor.linenumbers=true"); break;
-                            case "recent.sketches": configData.Add("recent.sketches=" + boeBotProjectDst + "," + boeBotTestDst); break;
                             case "serial.debug_rate": configData.Add("serial.debug_rate=115200"); break;
                             default: configData.Add(s); break;
                         }
