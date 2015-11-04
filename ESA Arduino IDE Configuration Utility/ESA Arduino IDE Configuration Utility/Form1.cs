@@ -25,6 +25,7 @@ namespace ESA_Arduino_IDE_Configuration_Utility
         public void Operate()
         {
             string appdataRoaming = System.Environment.GetFolderPath(System.Environment.SpecialFolder.ApplicationData);
+            string documents = System.Environment.GetFolderPath(System.Environment.SpecialFolder.MyDocuments);
             string downloads = System.Environment.GetFolderPath(System.Environment.SpecialFolder.UserProfile) + @"\Downloads";
             string workingDir = Directory.GetCurrentDirectory();
             string programConfig = Path.Combine(workingDir, "config.txt");
@@ -49,11 +50,11 @@ namespace ESA_Arduino_IDE_Configuration_Utility
                         {
                             case "IDEConfigLocationOverride":
                                 ideConfigOverride = true;
-                                ideConfigLocationOverride = options[1].Trim();
+                                ideConfigLocationOverride = @String.Concat(options[1].Trim(), ":", options[2]);
                                 break;
                             case "SketchbookLocationOverride":
                                 sketchbookOverride = true;
-                                sketchbookLocationOverride = options[1].Trim();
+                                sketchbookLocationOverride = @String.Concat(options[1].Trim(), ":", options[2]);
                                 break;
                             case "IDEConfigPath":
                                 ideConfigFolder = options[1].Trim();
@@ -68,6 +69,14 @@ namespace ESA_Arduino_IDE_Configuration_Utility
                     }
                 }
             }
+
+            sketchbookPath = sketchbookOverride ? sketchbookLocationOverride : Path.Combine(documents, @"Arduino");
+            string librariesDirectory = Path.Combine(sketchbookPath, @"libraries\BOEbot");
+            string accessoriesSrc = Path.Combine(downloads, "accessories-master");
+            string librariesSrc = Path.Combine(downloads, "user_functions-master");
+            string boeBotProjectDst = Path.Combine(sketchbookPath, @"ESA_Robot_Project\ESA_Robot_Project.ino");
+            string boeBotTestDst = Path.Combine(sketchbookPath, @"ESA_Robot_Test\ESA_Robot_Test.ino");
+
 
             WebClient client = new WebClient();
             
@@ -106,12 +115,7 @@ namespace ESA_Arduino_IDE_Configuration_Utility
             catch (Exception e) {  /* */ }
 
             string ideConfigPath = ideConfigOverride ? ideConfigLocationOverride : Path.Combine(appdataRoaming, ideConfigFolder);
-            string librariesDirectory = Path.Combine(sketchbookPath, @"libraries\BOEbot");
-            string accessoriesSrc = Path.Combine(downloads, "accessories-master");
-            string librariesSrc = Path.Combine(downloads, "user_functions-master");
-            string boeBotProjectDst = Path.Combine(sketchbookPath, @"ESA_Robot_Project\ESA_Robot_Project.ino");
-            string boeBotTestDst = Path.Combine(sketchbookPath, @"ESA_Robot_Test\ESA_Robot_Test.ino");
-
+            
             List<String> configData = new List<String>();
 
             try
@@ -129,7 +133,6 @@ namespace ESA_Arduino_IDE_Configuration_Utility
                             case "editor.linenumbers": configData.Add("editor.linenumbers=true"); break;
                             case "recent.sketches": configData.Add("recent.sketches=" + boeBotProjectDst + "," + boeBotTestDst); break;
                             case "serial.debug_rate": configData.Add("serial.debug_rate=115200"); break;
-                            case "sketchbook.path": sketchbookPath = options[1]; configData.Add(s); break;
                             default: configData.Add(s); break;
                         }
                     }
@@ -149,9 +152,6 @@ namespace ESA_Arduino_IDE_Configuration_Utility
             {
                 this.Invoke(new VoidDelegate(IDEConfigError));
             }
-
-            sketchbookPath = sketchbookOverride ? sketchbookLocationOverride : sketchbookPath;
-
 
             Microsoft.VisualBasic.Devices.Computer pc = new Microsoft.VisualBasic.Devices.Computer();
 
