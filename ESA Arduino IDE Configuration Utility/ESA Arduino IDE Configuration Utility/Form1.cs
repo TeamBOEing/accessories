@@ -25,52 +25,21 @@ namespace ESA_Arduino_IDE_Configuration_Utility
         public void Operate()
         {
             string appdataRoaming = System.Environment.GetFolderPath(System.Environment.SpecialFolder.ApplicationData);
+            string appdataLocal = System.Environment.GetFolderPath(System.Environment.SpecialFolder.LocalApplicationData);
             string documents = System.Environment.GetFolderPath(System.Environment.SpecialFolder.MyDocuments);
             string downloads = System.Environment.GetFolderPath(System.Environment.SpecialFolder.UserProfile) + @"\Downloads";
             string workingDir = Directory.GetCurrentDirectory();
-            string programConfig = Path.Combine(workingDir, "config.txt");
+            //string programConfig = Path.Combine(workingDir, "config.txt");
             string ideConfigFolder = "";
-            string ideConfigLocationOverride = "";
-            string sketchbookLocationOverride = "";
-            string sketchbookPath = "";
-            bool ideConfigOverride = false;
-            bool sketchbookOverride = false;
-            Uri libraryLocationOnline = null;
-            Uri codeAndTestLocationOnline = null;
+            //string ideConfigLocationOverride = "";
+            //string sketchbookLocationOverride = "";
+            string sketchbookPath = Path.Combine(documents, @"Arduino");
+            string ideConfigPath = "";
+            //bool ideConfigOverride = false;
+            //bool sketchbookOverride = false;
+            Uri libraryLocationOnline = new Uri(@"https://github.com/TeamBOEing/user_functions/archive/master.zip");
+            Uri codeAndTestLocationOnline = new Uri(@"https://github.com/TeamBOEing/accessories/archive/master.zip");
 
-            using (StreamReader sr = File.OpenText(programConfig))
-            {
-                string s = "";
-                while ((s = sr.ReadLine()) != null)
-                {
-                    if (s[0] != '#')
-                    {
-                        string[] options = s.Split(':');
-                        switch (options[0])
-                        {
-                            case "IDEConfigLocationOverride":
-                                ideConfigOverride = true;
-                                ideConfigLocationOverride = @String.Concat(options[1].Trim(), ":", options[2]);
-                                break;
-                            case "SketchbookLocationOverride":
-                                sketchbookOverride = true;
-                                sketchbookLocationOverride = @String.Concat(options[1].Trim(), ":", options[2]);
-                                break;
-                            case "IDEConfigPath":
-                                ideConfigFolder = options[1].Trim();
-                                break;
-                            case "OnlineLibraryLocation":
-                                libraryLocationOnline = new Uri(@String.Concat(options[1].Trim(), ":", options[2]));
-                                break;
-                            case "OnlineProjectLocations":
-                                codeAndTestLocationOnline = new Uri(@String.Concat(options[1].Trim(), ":", options[2]));
-                                break;
-                        }
-                    }
-                }
-            }
-
-            sketchbookPath = sketchbookOverride ? sketchbookLocationOverride : Path.Combine(documents, @"Arduino");
             string librariesDirectory = Path.Combine(sketchbookPath, @"libraries\BOEbot");
             string accessoriesSrc = Path.Combine(downloads, "accessories-master");
             string librariesSrc = Path.Combine(downloads, "user_functions-master");
@@ -114,8 +83,11 @@ namespace ESA_Arduino_IDE_Configuration_Utility
             }
             catch (Exception e) {  /* */ }
 
-            string ideConfigPath = ideConfigOverride ? ideConfigLocationOverride : Path.Combine(appdataRoaming, ideConfigFolder);
-            
+            if (ContainsPreferencesFile(appdataRoaming, out ideConfigFolder))
+                ideConfigPath = Path.Combine(appdataRoaming, ideConfigFolder);
+            else if (ContainsPreferencesFile(appdataLocal, out ideConfigFolder))
+                ideConfigPath = Path.Combine(appdataLocal, ideConfigFolder);
+              
             List<String> configData = new List<String>();
 
             try
@@ -245,6 +217,29 @@ namespace ESA_Arduino_IDE_Configuration_Utility
             lblInstall2.Text = lblInstall2.Text + " Error.";
             lblInstall2.ForeColor = Color.Red;
             pgbStatus.PerformStep();
+        }
+
+        bool ContainsPreferencesFile(string checkPath, out string foundPath)
+        {
+            string[] dirs = Directory.GetDirectories(checkPath, "Arduino*");
+            foundPath = "";
+
+            try
+            {
+                foreach (string s in dirs)
+                {
+                    string[] prefs = Directory.GetFiles(s, "preferences.txt");
+
+                    foreach (string p in prefs)
+                    {
+                        foundPath = p;
+                        return true;
+                    }
+                        
+                }
+            } catch(Exception e) { return false; }
+
+            return false;
         }
     }
 }
