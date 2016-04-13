@@ -196,6 +196,8 @@ void performMotorTest()
     Serial.println("Stop All. Motor test complete.");
     stopLeftMotor();
     stopRightMotor();
+
+    delay(1000);
   }
 
   printMenu();
