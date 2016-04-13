@@ -18,21 +18,21 @@ void setup()
 {
   initialize();
   Serial.println("Welcome to the BOEbot Test Suite!");
-  Serial.println("Use the menu below to select the test you'd like to run.\n");
+  Serial.println("Use the menu below to select the test you'd like to run.");
+  printMenu();
 }
 
 void loop() 
 {
   // put your main code here, to run repeatedly:
 
-  printMenu();
-  while (Serial.available() == 0) {} // Wait for input
-  processInput(Serial.read());
-  clearSerial();
+  if (Serial.available() > 0)
+    processInput(Serial.parseInt());
 }
 
 void printMenu()
 {
+  Serial.println("\n");
   Serial.println("1) Motor Test");
   Serial.println("2) IR Test");
   Serial.println("3) LDR Test");
@@ -55,153 +55,155 @@ void processInput(int choice)
 
 void performMotorTest()
 {
-  clearSerial();
-  Serial.println("Welcome to the Motor Test. Send 'c' to exit.\n");
+  Serial.println("\n\nWelcome to the Motor Test. Send 'c' to exit.\n");
 
   int shortDelay = 100; //let motors stop spinning before sending new commands
   int longDelay = 1000; //how long any given motor rotation should be
   int pauseDelay = 3000;//definite pause between sections of motor test
   int speed = 200;
-
-  //Left Forward
-  Serial.println("Left Forward");
-  turnLeftMotorForward(speed);
-  delay(longDelay); // let run for a moment
-  Serial.println("Stop");
-  stopLeftMotor();
-  stopRightMotor();
-  delay(shortDelay);
-
-  Serial.println();
-
-  //Left Backward
-  Serial.println("Left Backward");
-  turnLeftMotorBackward(speed);
-  delay(longDelay); // let run for a moment
-  Serial.println("Stop");
-  stopLeftMotor();
-  stopRightMotor();
-  delay(shortDelay);
-
-  Serial.println();
-
-  //Right Forward
-  Serial.println("Right Forward");
-  turnRightMotorForward(speed);
-  delay(longDelay); // let run for a moment
-  Serial.println("Stop");
-  stopLeftMotor();
-  stopRightMotor();
-  delay(shortDelay);
-
-  Serial.println();
-
-  //Right Backward
-  Serial.println("Right Backward");
-  turnRightMotorBackward(speed);
-  delay(longDelay); // let run for a moment
-  Serial.println("Stop");
-  stopLeftMotor();
-  stopRightMotor();
-  delay(shortDelay);
-
-  Serial.println();
-
-  Serial.println("Individual directions tested, pausing.");
-  delay(pauseDelay);
-  Serial.println("Begin simultaneous operaton test.");
-
-  //both forward
-  Serial.println("Both Forward");
-  turnRightMotorForward(speed);
-  turnLeftMotorForward(speed);
-  delay(longDelay); // let run for a moment
-  Serial.println("Stop");
-  stopLeftMotor();
-  stopRightMotor();
-  delay(shortDelay);
-
-  Serial.println();
-
-  //both backward
-  Serial.println("Both Backward");
-  turnRightMotorBackward(speed);
-  turnLeftMotorBackward(speed);
-  delay(longDelay); // let run for a moment
-  Serial.println("Stop");
-  stopLeftMotor();
-  stopRightMotor();
-  delay(shortDelay);
-
-  Serial.println();
-
-  //left forward right backward
-  Serial.println("Left Forward/Right Backward");
-  turnRightMotorBackward(speed);
-  turnLeftMotorForward(speed);
-  delay(longDelay); // let run for a moment
-  Serial.println("Stop");
-  stopLeftMotor();
-  stopRightMotor();
-  delay(shortDelay);
-
-  Serial.println();
+  while (Serial.available() == 0)
+  {
+    //Left Forward
+    Serial.println("Left Forward");
+    turnLeftMotorForward(speed);
+    delay(longDelay); // let run for a moment
+    Serial.println("Stop");
+    stopLeftMotor();
+    stopRightMotor();
+    delay(shortDelay);
   
-  //right forward left backard
-  Serial.println("Right Forward/Left Backward");
-  turnRightMotorForward(speed);
-  turnLeftMotorBackward(speed);
-  delay(longDelay); // let run for a moment
-  Serial.println("Stop");
-  stopLeftMotor();
-  stopRightMotor();
-  delay(shortDelay);
-
-  Serial.println();
-
-  Serial.println("Simultaneous operation test complete, pausing.");
-  delay(pauseDelay);
-  Serial.println("Begin motor operation interference test.");
-
-  //start both forward
-  Serial.println("Start Both Forward");
-  turnRightMotorForward(speed);
-  turnLeftMotorForward(speed);
-  delay(longDelay);
-
-  //reverse left and return
-  Serial.println("Reverse Left");
-  stopLeftMotor();
-  delay(shortDelay);
-  turnLeftMotorBackward(speed);
-  delay(longDelay);
-  stopLeftMotor();
-  delay(shortDelay);
-  turnLeftMotorForward(speed);
+    Serial.println();
   
-  delay(pauseDelay);
+    //Left Backward
+    Serial.println("Left Backward");
+    turnLeftMotorBackward(speed);
+    delay(longDelay); // let run for a moment
+    Serial.println("Stop");
+    stopLeftMotor();
+    stopRightMotor();
+    delay(shortDelay);
   
-  //reverse right and return
-  Serial.println("Reverse Right");
-  stopRightMotor();
-  delay(shortDelay);
-  turnRightMotorBackward(speed);
-  delay(longDelay);
-  stopRightMotor();
-  delay(shortDelay);
-  turnRightMotorForward(speed);
+    Serial.println();
+  
+    //Right Forward
+    Serial.println("Right Forward");
+    turnRightMotorForward(speed);
+    delay(longDelay); // let run for a moment
+    Serial.println("Stop");
+    stopLeftMotor();
+    stopRightMotor();
+    delay(shortDelay);
+  
+    Serial.println();
+  
+    //Right Backward
+    Serial.println("Right Backward");
+    turnRightMotorBackward(speed);
+    delay(longDelay); // let run for a moment
+    Serial.println("Stop");
+    stopLeftMotor();
+    stopRightMotor();
+    delay(shortDelay);
+  
+    Serial.println();
+  
+    Serial.println("Individual directions tested, pausing.");
+    delay(pauseDelay);
+    Serial.println("Begin simultaneous operaton test.");
+  
+    //both forward
+    Serial.println("Both Forward");
+    turnRightMotorForward(speed);
+    turnLeftMotorForward(speed);
+    delay(longDelay); // let run for a moment
+    Serial.println("Stop");
+    stopLeftMotor();
+    stopRightMotor();
+    delay(shortDelay);
+  
+    Serial.println();
+  
+    //both backward
+    Serial.println("Both Backward");
+    turnRightMotorBackward(speed);
+    turnLeftMotorBackward(speed);
+    delay(longDelay); // let run for a moment
+    Serial.println("Stop");
+    stopLeftMotor();
+    stopRightMotor();
+    delay(shortDelay);
+  
+    Serial.println();
+  
+    //left forward right backward
+    Serial.println("Left Forward/Right Backward");
+    turnRightMotorBackward(speed);
+    turnLeftMotorForward(speed);
+    delay(longDelay); // let run for a moment
+    Serial.println("Stop");
+    stopLeftMotor();
+    stopRightMotor();
+    delay(shortDelay);
+  
+    Serial.println();
+    
+    //right forward left backard
+    Serial.println("Right Forward/Left Backward");
+    turnRightMotorForward(speed);
+    turnLeftMotorBackward(speed);
+    delay(longDelay); // let run for a moment
+    Serial.println("Stop");
+    stopLeftMotor();
+    stopRightMotor();
+    delay(shortDelay);
+  
+    Serial.println();
+  
+    Serial.println("Simultaneous operation test complete, pausing.");
+    delay(pauseDelay);
+    Serial.println("Begin motor operation interference test.");
+  
+    //start both forward
+    Serial.println("Start Both Forward");
+    turnRightMotorForward(speed);
+    turnLeftMotorForward(speed);
+    delay(longDelay);
+  
+    //reverse left and return
+    Serial.println("Reverse Left");
+    stopLeftMotor();
+    delay(shortDelay);
+    turnLeftMotorBackward(speed);
+    delay(longDelay);
+    stopLeftMotor();
+    delay(shortDelay);
+    turnLeftMotorForward(speed);
+    
+    delay(pauseDelay);
+    
+    //reverse right and return
+    Serial.println("Reverse Right");
+    stopRightMotor();
+    delay(shortDelay);
+    turnRightMotorBackward(speed);
+    delay(longDelay);
+    stopRightMotor();
+    delay(shortDelay);
+    turnRightMotorForward(speed);
+  
+    delay(pauseDelay);
+  
+    Serial.println("Stop All. Motor test complete.");
+    stopLeftMotor();
+    stopRightMotor();
+  }
 
-  delay(pauseDelay);
-
-  Serial.println("Stop All. Motor test complete.");
-  stopLeftMotor();
-  stopRightMotor();
+  printMenu();
 }
 
 void performIRTest()
 {
-  clearSerial();
-  Serial.println("Welcome to the IR Test. Send 'c' to exit.\n");
+  Serial.println("\n\nWelcome to the IR Test. Send 'c' to exit.\n");
 
   while(Serial.available() == 0)
   {
@@ -229,13 +231,13 @@ void performIRTest()
     
     delay(1000);
   }
-  
+
+  printMenu();
 }
 
 void performLDRTest()
 {
-  clearSerial();
-  Serial.println("Welcome to the LDR Test. Send 'c' to exit.\n"); 
+  Serial.println("\n\nWelcome to the LDR Test. Send 'c' to exit.\n"); 
 
   while (Serial.available() == 0)
   {
@@ -247,12 +249,13 @@ void performLDRTest()
     
     delay(1000);
   }
+
+  printMenu();
 }
 
 void performLEDTest()
 {
-  clearSerial();
-  Serial.println("Welcome to the LED Test. Send 'c' to exit.\n");
+  Serial.println("\n\nWelcome to the LED Test. Send 'c' to exit.\n");
 
   int time = 500;
   
@@ -273,12 +276,13 @@ void performLEDTest()
     Serial.println("Red Off");
     delay(time);
   }
+
+  printMenu();
 }
 
 void performSpeakerTest()
 {
-  clearSerial();
-  Serial.println("Welcome to the Speaker Test. Send 'c' to exit.\n");
+  Serial.println("\n\nWelcome to the Speaker Test. Send 'c' to exit.\n");
 
   int length = 500;
   
@@ -305,15 +309,9 @@ void performSpeakerTest()
     
     Serial.println("Speaker off.");
 
-    delay(5000);
+    delay(length);
   }
-}
 
-void clearSerial()
-{
-  for (int i = 0; i < 25; i++)
-  {
-    Serial.println();
-  }
+  printMenu();
 }
 
